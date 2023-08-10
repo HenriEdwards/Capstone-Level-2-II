@@ -1,5 +1,6 @@
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.StringBuilder;
 
 public class Invoice {
 
@@ -11,7 +12,7 @@ public class Invoice {
 	public void setOrderNumber(Integer orderNumber) {
 		this.orderNumber = orderNumber;
 	}
-	
+
 	// getter methods
 	public Integer getOrderNumber() {
 		return orderNumber;
@@ -22,20 +23,23 @@ public class Invoice {
 			// create a FileWriter object to write output to
 			FileWriter writer = new FileWriter(INVOICE_FILE_NAME);
 
+			// create a stringBuilder object
+			StringBuilder stringBuilder = new StringBuilder();
+
 			if (!customer.getCustomerCityLocation().equalsIgnoreCase(driver.getDeliveryDriverLocation())) {
-				writer.write("Sorry! Our drivers are too far away from you to be able to deliver to your location.");
+				stringBuilder.append("Sorry! Our drivers are too far away from you to be able to deliver to your location.");
 			} else {
 				// increase order #
 				setOrderNumber(++orderNumber);
 
 				// write the order details to file
-				writer.write("Order number: " + getOrderNumber() + "\n");
-				writer.write("Customer: " + customer.getCustomerName() + "\n");
-				writer.write("Email: " + customer.getCustomerEmail() + "\n");
-				writer.write("Phone number: " + customer.getCustomerContact() + "\n");
-				writer.write("Location: " + customer.getCustomerCityLocation() + "\n\n");
-				writer.write("You have ordered the following from " + restaurant.getRestaurantName() + " in "
-						+ restaurant.getRestaurantLocation() + ":\n\n");
+				stringBuilder.append("Order number: ").append(getOrderNumber()).append("\n");
+				stringBuilder.append("Customer: ").append(customer.getCustomerName()).append("\n");
+				stringBuilder.append("Email: ").append(customer.getCustomerEmail()).append("\n");
+				stringBuilder.append("Phone number: ").append(customer.getCustomerContact()).append("\n");
+				stringBuilder.append("Location: ").append(customer.getCustomerCityLocation()).append("\n\n");
+				stringBuilder.append("You have ordered the following from ").append(restaurant.getRestaurantName())
+						.append(" in ").append(restaurant.getRestaurantLocation()).append(":\n\n");
 
 				// loop to write each meal item/price/quantity to file
 				for (int i = 0; i < meal.getMealList().size(); i++) {
@@ -44,21 +48,21 @@ public class Invoice {
 					// format price to ensure 2 decimals
 					String mealPriceFormatted = String.format("%.2f", meal.getPriceList().get(i));
 					String price = mealPriceFormatted;
-					writer.write(quantity + " x " + mealName + " (R" + price + ")\n");
+					stringBuilder.append(quantity).append(" x ").append(mealName).append(" (R").append(price).append(")\n");
 				}
-				writer.write("\n");
+				stringBuilder.append("\n");
 
 				// add special prep or none
 				if (!meal.getSpecialPrep().isEmpty()) {
-					writer.write("Special instructions: " + meal.getSpecialPrep() + "\n\n");
+					stringBuilder.append("Special instructions: ").append(meal.getSpecialPrep()).append("\n\n");
 				} else {
-					writer.write("Special instructions: None\n\n");
+					stringBuilder.append("Special instructions: None\n\n");
 				}
 
 				// call getTotalCost method & format to ensure 2 decimals
-				writer.write("Total: R" + String.format("%.2f", meal.getTotalCost()) + "\n\n");
-				writer.write(driver.getDeliveryDriverName()
-						+ " is nearest to the restaurant and so he will be delivering your order to you at:\n\n");
+				stringBuilder.append("Total: R").append(String.format("%.2f", meal.getTotalCost())).append("\n\n");
+				stringBuilder.append(driver.getDeliveryDriverName())
+						.append(" is nearest to the restaurant and so he will be delivering your order to you at:\n\n");
 
 				// check if there is a space in the customer address
 				if (customer.getCustomerAddress().contains(" ")) {
@@ -66,17 +70,19 @@ public class Invoice {
 					int lastSpaceIndex = customer.getCustomerAddress().lastIndexOf(" ");
 					String firstLine = customer.getCustomerAddress().substring(0, lastSpaceIndex);
 					String secondLine = customer.getCustomerAddress().substring(lastSpaceIndex + 1);
-					writer.write(firstLine + "\n" + secondLine + "\n\n");
+					stringBuilder.append(firstLine).append("\n").append(secondLine).append("\n\n");
 				} else {
-					writer.write(customer.getCustomerAddress() + "\n\n");
+					stringBuilder.append(customer.getCustomerAddress()).append("\n\n");
 				}
-				writer.write("If you need to contact the restaurant, their number is " + restaurant.getRestaurantContact() + ".");
+				stringBuilder.append("If you need to contact the restaurant, their number is ")
+						.append(restaurant.getRestaurantContact()).append(".");
 			}
-			// close the FileWriter
+
+			// write stringBuilder to txt file
+			writer.write(stringBuilder.toString());
 			writer.close();
 		} catch (IOException e) {
 			System.out.println("An error occurred while writing the invoice: " + e.getMessage());
 		}
 	}
 }
-
