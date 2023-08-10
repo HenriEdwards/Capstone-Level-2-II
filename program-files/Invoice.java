@@ -5,6 +5,7 @@ public class Invoice {
 
 	// attributes
 	private Integer orderNumber = 0;
+	private static final String INVOICE_FILE_NAME = "invoice.txt";
 
 	// setter methods
 	public void setOrderNumber(Integer orderNumber) {
@@ -19,7 +20,7 @@ public class Invoice {
 	public void writeInvoice(Customer customer, Meal meal, Restaurant restaurant, DeliveryDriver driver) {
 		try {
 			// create a FileWriter object to write output to
-			FileWriter writer = new FileWriter("invoice.txt");
+			FileWriter writer = new FileWriter(INVOICE_FILE_NAME);
 
 			if (!customer.getCustomerCityLocation().equalsIgnoreCase(driver.getDeliveryDriverLocation())) {
 				writer.write("Sorry! Our drivers are too far away from you to be able to deliver to your location.");
